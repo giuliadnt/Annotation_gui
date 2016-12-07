@@ -1,36 +1,3 @@
-/*  $.ajax({
-     type: 'GET',
-     url: 'tweet_pairs3.json',
-     data: 'tweet_pairs3.json',
-     //async: false,
-     beforeSend: function (xhr) {
-      if (xhr && xhr.overrideMimeType) {
-      xhr.overrideMimeType('application/json;charset=utf-8');
-     }
-    },
-    dataType: 'jsonp',
-    success: function (data) {
-       //Do stuff with the JSON data
-       console.log(data)
-    }
-   });  */
-
-
-/*$.getJSON('tweet_pairs3.json', function (data) {
-  //console.log(data);
-  $.each(data.Pairs, function (i, Pairs) {
-    //console.log(i);
-    $('#sub').on('click',function(e){
-      e.preventDefault();
-      var tweetList = ('<li><a href="#">' + Pairs.full_tweet + '</a></li>');
-      $('#full_tweet').append(tweetList);
-
-      var noEmojiList = ('<li><a href="#">' + Pairs.tweet_no_emoji + '</a></li>');
-      $('#tweet_no_emoji').append(noEmojiList);
-     });//$('#sub')
-  }); //$.each(...)
-
-}); //$.getJSON*/
 var OVERLAPPING_ITEMS = 100;
 var MAX_ITEMS = 1000; 
 
