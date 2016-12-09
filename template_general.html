@@ -19,7 +19,6 @@
 
     <!-- Custom styles for this template -->
     <link href="cover.css" rel="stylesheet">
-    <!--<link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">-->
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
      <!--<script src="../../assets/js/ie-emulation-modes-warning.js"></script>-->
@@ -32,6 +31,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js.cookie.js"></script>
     <script src="myscript.js"></script>
+    <script src="p.js"></script>
   </head>
 
   <body>
@@ -44,10 +44,6 @@
          
           <div class="inner cover">
             
-            
-            
-         
-
               <ol type="A">
                 <li><span id="full_tweet"></span></li><br>
                 <li><span id="tweet_no_emoji"></span></li><br>
@@ -58,15 +54,18 @@
               <input id ="R_" type="radio" name="Tag" value="R">Redundant<br>
               <input id ="Non_R" type="radio" name="Tag" value="Non R">Non Redundant<br>
               <input id ="POS" type="radio" name="Tag" value="Non R + POS">Non Redundant + POS<br>
-              <input id="sub" type="submit" value="Submit">
+              <input id="sub" type="submit" value="Submit"> 
               </form>
-            
-              <table id="Data_to_Store">
+
+
+              <a id="save" href="" class="download">End Session</a>
+              <table id="Data_to_Store", class="hidden">
                 <tr>
                   <td>Annotator</td>
                   <td>Pair_Index</td>
                   <td>Class</td>
                 </tr>
+
               </table>
           </div>
          

@@ -29,6 +29,13 @@ a:hover {
 /*
  * Base structure
  */
+/*a.download{
+  display: none;
+}*/
+
+textarea{
+  display: none;
+}
 
 html,
 body {
@@ -41,6 +48,11 @@ body {
   font-family: "Lucida Sans Unicode";
   text-shadow: none;/*0 1px 3px rgba(0,0,0,.5);*/
 }
+
+table.hidden {
+   display: none;
+}
+
 
 /* Extra markup and styles for table-esque vertical and horizontal centering */
 .site-wrapper {
