@@ -58,22 +58,3 @@ $(document).ready(function () {
     });
 
 });
-
-function getPositionInTask() {
-  var toReturn;
-  // Check whether we have stored the annotator id, in a cookie
-  if (Cookies.get()) {
-    // If so, get it
-    toReturn = Cookies.get();
-  }
-  // else
-  else {
-    // Create a new (random) id
-    toReturn = 
-    // Store it in a cookie
-    Cookies.set("", toReturn);
-  }
-
-  // Return the retrieved id
-  return toReturn;
-}
