@@ -1,5 +1,6 @@
-var OVERLAPPING_ITEMS = 100;
-var MAX_ITEMS = 1000; 
+
+var OVERLAPPING_ITEMS = 10; //set to 100
+var MAX_ITEMS = OVERLAPPING_ITEMS + 15;  //set to 1000
 
 function resetForm() {
     $('#R_').prop('checked', false);
@@ -96,12 +97,39 @@ $.getJSON('tweet_pairs3.json', function (data) {
     $.seenItemIdx += 1;
 
     // Check if we have reached the end
-    if ($.seenItemIdx >= MAX_ITEMS) {
-      // If so, then move to a thank you page
-      window.location.href = 'Zlast_page.html';
+    if ($.seenItemIdx >= MAX_ITEMS+1) {
+
+      // If so:
+      //Disable submission
+      $("#sub").attr("disabled", true);
+      //Then move to a thank you page after click & download
+      //window.location.href = 'Zlast_page.html'; 
+
+      //Download link appears
+      //$('#save').show();
+
+      //$('#save').on('click', function(e){
+
+          //add download
+          
+       //});
     } //if()
 
   }); //$('#sub').on
   
 }); //$.getJSON*/
 
+
+//do something to restart session from when previously ended
+
+//cookie get pair index
+//if < 100 restart from pairs[index+1] 
+//if > 100 
+//get how many pairs have been annotated
+//set seenItems = to number of annotated
+//restart from random point
+//continue annotation until reached 1000 + 100
+
+//function getPairIndexOnEndSession(){
+
+//}
