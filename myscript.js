@@ -1,6 +1,66 @@
 
-var OVERLAPPING_ITEMS = 10; //set to 100
-var MAX_ITEMS = OVERLAPPING_ITEMS + 15;  //set to 1000
+var OVERLAPPING_ITEMS = 8; //set to 100
+var MAX_ITEMS = OVERLAPPING_ITEMS + 10;  //set to 1000
+
+
+//function exportTableToCSV from stackoverflow 
+//http://stackoverflow.com/questions/7161113/how-do-i-export-html-table-data-as-csv-file
+//$(document).ready(function () {
+
+function exportTableToCSV($table, filename) {
+
+    var $rows = $table.find('tr:has(td),tr:has(th)'),
+
+        // Temporary delimiter characters unlikely to be typed by keyboard
+        // This is to avoid accidentally splitting the actual contents
+        tmpColDelim = String.fromCharCode(11), // vertical tab character
+        tmpRowDelim = String.fromCharCode(0), // null character
+
+        // actual delimiter characters for CSV format
+        colDelim = '","',
+        rowDelim = '"\r\n"',
+
+        // Grab text from table into CSV formatted string
+        csv = '"' + $rows.map(function (i, row) {
+            var $row = $(row), $cols = $row.find('td,th');
+
+            return $cols.map(function (j, col) {
+                var $col = $(col), text = $col.text();
+
+                return text.replace(/"/g, '""'); // escape double quotes
+
+            }).get().join(tmpColDelim);
+
+        }).get().join(tmpRowDelim)
+            .split(tmpRowDelim).join(rowDelim)
+            .split(tmpColDelim).join(colDelim) + '"',
+
+        // Data URI
+        csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+        
+        console.log(csv);
+        
+      if (window.navigator.msSaveBlob) { // IE 10+
+        //alert('IE' + csv);
+        window.navigator.msSaveOrOpenBlob(new Blob([csv], {type: "text/plain;charset=utf-8;"}), "csvname.csv")
+      } 
+      else {
+        $(this).attr({ 'download': filename, 'href': csvData, 'target': '_blank' }); 
+      }
+}
+    
+    /*// This must be a hyperlink
+    $("#save").on('click', function (event) {
+      
+        exportTableToCSV.apply(this, [$('#Data_to_Store'), 'export.csv']);
+        window.location.href = 'Zlast_page.html'; 
+        // IF CSV, don't do event.preventDefault() or return false
+        // We actually need this to be a typical hyperlink
+    });
+*/
+//});
+
+
 
 function resetForm() {
     $('#R_').prop('checked', false);
@@ -8,38 +68,71 @@ function resetForm() {
     $('#POS').prop('checked', false);
 }
 
-function storeToTable(annotatorId, currentIndex, selected) {
+/*function storeToTable(annotatorId, currentIndex, selected) {
   $('#Data_to_Store tr:last').after('<tr><td>' + annotatorId + '</td><td>'+currentIndex+'</td><td>'+selected+'</td></tr>');
+}*/ //original function
+
+function storeToTable() { //function with no parameters
+  $('#Data_to_Store tr:last').after('<tr><td>' + getAnnotatorID() + '</td><td>'+$.currentIndex+'</td><td>'+$.selected+'</td></tr>');
+}
+
+function firstSession() {
+  return (Cookies.get("currentAnnotationID") === undefined);
 }
 
 function getNextTweet() {
-  var pairToReturn = {};
-
-  var seenItems = $.seenItemIdx - 1;
   var indexToUse = -1;
-  // If the annotator has seen more than OVERLAPPING_ITEMS tweets
-  if (seenItems >= OVERLAPPING_ITEMS) {
-    // choose the next tweet randomly (beyond the first 100)
-    indexToUse = OVERLAPPING_ITEMS + Math.round(($.tweetList.length - OVERLAPPING_ITEMS) * Math.random());
-    console.log("Visiting randomly:" + indexToUse);
+
+  // Check if this is the first time
+  if ($.currentIndex < 0)
+  {
+    // If so, then check whether this is not the first session
+    if (!firstSession()) {
+      // restore the state
+      loadState();
+      // Indicate the current index
+      indexToUse = $.currentIndex;
+    }
+  }
+
+  var pairToReturn = {};
+  if (indexToUse <= -1) {
+    // If the annotator has seen more than OVERLAPPING_ITEMS tweets
+    if ($.seenItem >= OVERLAPPING_ITEMS) {
+      // choose the next tweet randomly (beyond the first 100)
+      indexToUse = OVERLAPPING_ITEMS + Math.round(($.tweetList.length - OVERLAPPING_ITEMS) * Math.random());
+      console.log("Visiting randomly:" + indexToUse);
+    }
+    else
+    // else
+    {
+      // get the next one normally
+      indexToUse = $.currentIndex + 1;
+      console.log("Visiting normally:" + indexToUse);
+    }
   }
   else
-  // else
   {
-    // get the next one normally
-    indexToUse += $.seenItemIdx + 1;
-    console.log("Visiting normally:" + indexToUse);
+    console.log("Restored:" + indexToUse);
   }
-    
+  
+  pairToReturn.itemIndex = indexToUse;  
   pairToReturn.fullTweet = $.tweetList[indexToUse];
   pairToReturn.noEmoji = $.noEmojiList[indexToUse];
+    //return pairToReturn;
+    
+  return {ppair:pairToReturn, iddx:indexToUse};
 
-  return pairToReturn;
 }
 
 function fillInFormWith(pair) {
   $('#full_tweet').html(pair.fullTweet);
-  $('#tweet_no_emoji').html(pair.noEmoji);  
+  $('#tweet_no_emoji').html(pair.noEmoji);
+
+  // Update current index
+  $.currentIndex = pair.itemIndex;
+  
+
 }
 
 function getAnnotatorID() {
@@ -54,18 +147,34 @@ function getAnnotatorID() {
     // Create a new (random) id
     toReturn = "A" + Math.round(Math.random() * 10000);
     // Store it in a cookie
-    Cookies.set("annotatorId", toReturn);
+    Cookies.set("annotatorId", toReturn, { expires: 30 });
   }
 
   // Return the retrieved id
   return toReturn;
 }
 
+
+function loadState() {
+  // Restore from cookies
+  $.seenItem = (Cookies.get("annotationNumber") === undefined) ? 0 : parseInt(Cookies.get("annotationNumber"));
+  $.currentIndex = (Cookies.get("currentAnnotationID") === undefined) ? -1 : parseInt(Cookies.get("currentAnnotationID"));
+
+}
+
+function saveState() {
+  // Store it in cookies
+  var inTwoMinutes = new Date(new Date().getTime() + 2 * 60 * 1000);
+  console.log(inTwoMinutes);
+  Cookies.set("annotationNumber", $.seenItem, {expires: inTwoMinutes});
+  Cookies.set("currentAnnotationID", $.currentIndex, {expires: inTwoMinutes});
+}
+
 $.getJSON('tweet_pairs3.json', function (data) {
   // Initialize pair lists GLOBALLY
   $.tweetList=[];
   $.noEmojiList=[];
-
+  
   // For each pair
   $.each(data.Pairs, function (i, Pairs) {
     // Update the tweet and noEmoji lists 
@@ -73,63 +182,73 @@ $.getJSON('tweet_pairs3.json', function (data) {
     $.noEmojiList.push(Pairs.tweet_no_emoji);   
   }); //$.each(...)
 
+  // Initialize index pointer and count
+  $.currentIndex = -1;
+  $.seenItem = 0;
   // Show first item
-  $('#full_tweet').html($.tweetList[0]);
-  $('#tweet_no_emoji').html($.noEmojiList[0]);
+  var initTweet = getNextTweet();
+  // Reset form
+  resetForm();
+  // Get next tweet and fill in the related controls
+  fillInFormWith(initTweet.ppair);
   
-  $.seenItemIdx = 1; // Initialize next item index
   // Assign click event to submission button
   $('#sub').on('click', function(e){
     e.preventDefault(); // Disable actual submission
 
     // Get submitted data
-    var selected = $("input[name='Tag']:checked").val();
-    // Store to table
-    storeToTable(getAnnotatorID(), $.seenItemIdx - 1, selected);
+    //var selected = $("input[name='Tag']:checked").val(); original var
+    $.selected = $("input[name='Tag']:checked").val(); //var set as global
+
+    // Store object: pairs and index
+    var pairsAndIndex = getNextTweet();
     
+    // Store to table: annotator id, pairs index, chosen class
+    //storeToTable(getAnnotatorID(), pairsAndIndex.iddx, selected); original function with params
+    storeToTable(); //changed function
+
     // Reset form
     resetForm();
 
     // Get next tweet and fill in the related controls
-    fillInFormWith(getNextTweet());
+    fillInFormWith(pairsAndIndex.ppair);
   
     // Increase next item count
-    $.seenItemIdx += 1;
+    $.seenItem += 1; 
 
+    
     // Check if we have reached the end
-    if ($.seenItemIdx >= MAX_ITEMS+1) {
+    if ($.seenItem >= MAX_ITEMS) {
 
       // If so:
       //Disable submission
       $("#sub").attr("disabled", true);
-      //Then move to a thank you page after click & download
-      //window.location.href = 'Zlast_page.html'; 
 
-      //Download link appears
-      //$('#save').show();
-
-      //$('#save').on('click', function(e){
-
-          //add download
-          
-       //});
     } //if()
 
+    saveState();
+
   }); //$('#sub').on
+
+  
+  // This must be a hyperlink
+  $("#save").on('click', function (event) {
+
+      // Export the data
+      exportTableToCSV.apply(this, [$('#Data_to_Store'), 'export.csv']);
+      // Then move to the last page
+      window.location.href = 'Zlast_page.html'; 
+      // IF CSV, don't do event.preventDefault() or return false
+      // We actually need this to be a typical hyperlink
+  }); //$("#save").on
   
 }); //$.getJSON*/
 
 
-//do something to restart session from when previously ended
 
-//cookie get pair index
-//if < 100 restart from pairs[index+1] 
-//if > 100 
-//get how many pairs have been annotated
-//set seenItems = to number of annotated
-//restart from random point
-//continue annotation until reached 1000 + 100
 
-//function getPairIndexOnEndSession(){
 
-//}
+
+
+
+
