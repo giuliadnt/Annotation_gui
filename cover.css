@@ -32,7 +32,18 @@ a:hover {
 /*a.download{
   display: none;
 }*/
+@font-face {
+  font-family: emoji;
 
+  src: 
+       local(Symbola),
+       url('font/Symbola-Emoji.eot?#iefix') format('embedded-opentype'),
+       url('font/Symbola-Emoji.woff') format('woff'),
+       url('font/Symbola-Emoji.ttf') format('truetype');
+
+  /* Emoji unicode blocks */
+  unicode-range: U+1F300-1F5FF, U+1F600-1F64F, U+1F680-1F6FF, U+2600-26FF;
+}
 html,
 body {
   height: 100%;
@@ -49,7 +60,9 @@ table.hidden {
    display: none;
 }
 
-
+ol.tweets{
+  font-family: emoji;
+}
 /* Extra markup and styles for table-esque vertical and horizontal centering */
 .site-wrapper {
   display: table;

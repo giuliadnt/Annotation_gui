@@ -1,6 +1,6 @@
 
-var OVERLAPPING_ITEMS = 8; //set to 100
-var MAX_ITEMS = OVERLAPPING_ITEMS + 10;  //set to 1000
+var OVERLAPPING_ITEMS = 100; //set to 100
+var MAX_ITEMS = OVERLAPPING_ITEMS + 1000;  //set to 1000
 
 
 //function exportTableToCSV from stackoverflow 
@@ -72,7 +72,7 @@ function resetForm() {
   $('#Data_to_Store tr:last').after('<tr><td>' + annotatorId + '</td><td>'+currentIndex+'</td><td>'+selected+'</td></tr>');
 }*/ //original function
 
-function storeToTable() { //function with no parameters
+function storeToTable() { //function without parameters
   $('#Data_to_Store tr:last').after('<tr><td>' + getAnnotatorID() + '</td><td>'+$.currentIndex+'</td><td>'+$.selected+'</td></tr>');
 }
 
@@ -122,7 +122,6 @@ function getNextTweet() {
     //return pairToReturn;
     
   return {ppair:pairToReturn, iddx:indexToUse};
-
 }
 
 function fillInFormWith(pair) {
@@ -131,8 +130,6 @@ function fillInFormWith(pair) {
 
   // Update current index
   $.currentIndex = pair.itemIndex;
-  
-
 }
 
 function getAnnotatorID() {
@@ -147,7 +144,7 @@ function getAnnotatorID() {
     // Create a new (random) id
     toReturn = "A" + Math.round(Math.random() * 10000);
     // Store it in a cookie
-    Cookies.set("annotatorId", toReturn, { expires: 30 });
+    Cookies.set("annotatorId", toReturn, { expires: 40 });
   }
 
   // Return the retrieved id
@@ -159,15 +156,14 @@ function loadState() {
   // Restore from cookies
   $.seenItem = (Cookies.get("annotationNumber") === undefined) ? 0 : parseInt(Cookies.get("annotationNumber"));
   $.currentIndex = (Cookies.get("currentAnnotationID") === undefined) ? -1 : parseInt(Cookies.get("currentAnnotationID"));
-
 }
 
 function saveState() {
   // Store it in cookies
-  var inTwoMinutes = new Date(new Date().getTime() + 2 * 60 * 1000);
-  console.log(inTwoMinutes);
-  Cookies.set("annotationNumber", $.seenItem, {expires: inTwoMinutes});
-  Cookies.set("currentAnnotationID", $.currentIndex, {expires: inTwoMinutes});
+  //var inTwoMinutes = new Date(new Date().getTime() + 2 * 60 * 1000); //for testing
+  //console.log(inTwoMinutes);
+  Cookies.set("annotationNumber", $.seenItem, {expires: 40});
+  Cookies.set("currentAnnotationID", $.currentIndex, {expires: 40});
 }
 
 $.getJSON('tweet_pairs3.json', function (data) {
